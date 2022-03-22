@@ -91,8 +91,21 @@ async function action(payload) {
 function formatFileUrl(sourceDir, fileName, commit) {
   const repo = github.context.repo;
   sourceDir = sourceDir ? sourceDir : "";
+  
   // Strip leading and trailing slashes.
-  sourceDir = sourceDir.replace(/\/$/, "").replace(/^\//, "");
+  sourceDir = sourceDir.replace(/\/$/, "")
+    .replace(/^\//, "")
+  
+    // TODO: support mapping root via index of colon delimited list in `sourceDir`
+    // strip deterministic roots (see: https://github.com/danielpalme/ReportGenerator/issues/405)
+    .replace(/^(_\d{0,}\/)/, "");
+  
+  // check if the file is a raw github asset (e.g. coverlet UseSourceLink==true, see: https://github.com/coverlet-coverage/coverlet/blob/1f1a10143517da4e7b48b50caf16b407abe5a233/Documentation/VSTestIntegration.md#advanced-options-supported-via-runsettings)
+  var rawContentMatch = new RegExp(`^(http|https):\/\/raw\.githubusercontent\.com\/${repo.owner}\/${repo.repo}`).exec(fileName);
+  if(!!rawContentMatch) {
+    fileName = fileName.replace(rawContentMatch[0], "").replace(/^\//, "");
+  }
+  
   const path = (sourceDir ? `${sourceDir}/` : "") + fileName;
   return `https://github.com/${repo.owner}/${repo.repo}/blob/${commit}/${path}`;
 }
