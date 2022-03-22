@@ -90,25 +90,28 @@ async function action(payload) {
 
 function formatFileUrl(sourceDir, fileName, commit) {
   const repo = github.context.repo;
-  
+
   // TODO: support mapping root via index of colon delimited list in `sourceDir`
   // strip deterministic roots (see: https://github.com/danielpalme/ReportGenerator/issues/405)
-  fileName = fileName.replace(/^(\/{0,1}_\d{0,}\/)/, "");  
+  fileName = fileName.replace(/^(\/{0,1}_\d{0,}\/)/, "");
   sourceDir = sourceDir ? sourceDir : "";
-  
+
   // Strip leading and trailing slashes.
-  sourceDir = sourceDir.replace(/\/$/, "")
-    .replace(/^\//, "");
-  
-  core.debug(`formatFileUrl: normalized inputs (fileName: ${fileName}, sourceDir: ${sourceDir})`);
-  
+  sourceDir = sourceDir.replace(/\/$/, "").replace(/^\//, "");
+
+  core.debug(
+    `formatFileUrl: normalized inputs (fileName: ${fileName}, sourceDir: ${sourceDir})`
+  );
+
   // check if the file is a raw github asset (e.g. coverlet UseSourceLink==true, see: https://github.com/coverlet-coverage/coverlet/blob/1f1a10143517da4e7b48b50caf16b407abe5a233/Documentation/VSTestIntegration.md#advanced-options-supported-via-runsettings)
-  var rawContentMatch = new RegExp(`^(http|https):\/\/raw\.githubusercontent\.com\/${repo.owner}\/${repo.repo}`).exec(fileName);
-  if(!!rawContentMatch) {
+  var rawContentMatch = new RegExp(
+    `^(http|https):\/\/raw\.githubusercontent\.com\/${repo.owner}\/${repo.repo}\/${commit}`
+  ).exec(fileName);
+  if (!!rawContentMatch) {
     core.debug(`formatFileUrl: detected GitHub Raw content '${fileName}'`);
     fileName = fileName.replace(rawContentMatch[0], "").replace(/^\//, "");
   }
-  
+
   const path = (sourceDir ? `${sourceDir}/` : "") + fileName;
   return `https://github.com/${repo.owner}/${repo.repo}/blob/${commit}/${path}`;
 }
