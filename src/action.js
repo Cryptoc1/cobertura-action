@@ -98,7 +98,7 @@ function formatFileUrl(sourceDir, fileName, commit) {
   
     // TODO: support mapping root via index of colon delimited list in `sourceDir`
     // strip deterministic roots (see: https://github.com/danielpalme/ReportGenerator/issues/405)
-    .replace(/^(_\d{0,}\/)/, "");
+    .replace(/^(\/_\d{0,}\/)/, "");
   
   // check if the file is a raw github asset (e.g. coverlet UseSourceLink==true, see: https://github.com/coverlet-coverage/coverlet/blob/1f1a10143517da4e7b48b50caf16b407abe5a233/Documentation/VSTestIntegration.md#advanced-options-supported-via-runsettings)
   var rawContentMatch = new RegExp(`^(http|https):\/\/raw\.githubusercontent\.com\/${repo.owner}\/${repo.repo}`).exec(fileName);
